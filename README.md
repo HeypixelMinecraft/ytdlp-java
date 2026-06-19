@@ -2,6 +2,7 @@
 
 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 的 Java 移植版（MVP），以 **Java Library** 形式发布，HTTP 层基于 **OkHttp3**。
 
+[![](https://jitpack.io/v/HeypixelMinecraft/ytdlp-java.svg)](https://jitpack.io/#HeypixelMinecraft/ytdlp-java)
 - **Gradle 坐标**: `com.yt-dlp:yt-dlp`
 - **Java 包名**: `com.ytdlp`（Java 标识符不允许 `-`，故用 `ytdlp`）
 
