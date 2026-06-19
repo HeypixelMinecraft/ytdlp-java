@@ -19,6 +19,9 @@ public class Format {
     private Integer tbr;
     private Long filesize;
     private Map<String, String> httpHeaders = new HashMap<>();
+    private String manifestUrl;
+    private List<Fragment> fragments = new ArrayList<>();
+    private boolean hasDrm;
 
     public String getUrl() {
         return url;
@@ -138,5 +141,29 @@ public class Format {
 
     public boolean hasAudio() {
         return acodec != null && !"none".equals(acodec);
+    }
+
+    public String getManifestUrl() {
+        return manifestUrl;
+    }
+
+    public void setManifestUrl(String manifestUrl) {
+        this.manifestUrl = manifestUrl;
+    }
+
+    public List<Fragment> getFragments() {
+        return fragments;
+    }
+
+    public void setFragments(List<Fragment> fragments) {
+        this.fragments = fragments != null ? fragments : new ArrayList<>();
+    }
+
+    public boolean isHasDrm() {
+        return hasDrm;
+    }
+
+    public void setHasDrm(boolean hasDrm) {
+        this.hasDrm = hasDrm;
     }
 }

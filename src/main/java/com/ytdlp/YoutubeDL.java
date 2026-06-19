@@ -8,7 +8,9 @@ import com.ytdlp.exception.YtDlpException;
 import com.ytdlp.extractor.ExtractorRegistry;
 import com.ytdlp.extractor.InfoExtractor;
 import com.ytdlp.format.FormatSelector;
+import com.ytdlp.model.ExtractorResult;
 import com.ytdlp.model.Format;
+import com.ytdlp.model.PlaylistInfo;
 import com.ytdlp.model.VideoInfo;
 import com.ytdlp.networking.RequestDirector;
 import com.ytdlp.util.UrlUtils;
@@ -32,10 +34,6 @@ public class YoutubeDL implements AutoCloseable {
         this(options, null);
     }
 
-    /**
-     * @param options    download/extract options
-     * @param httpClient optional shared OkHttpClient; if null a client is created from options
-     */
     public YoutubeDL(YoutubeDLOptions options, OkHttpClient httpClient) {
         this.options = options;
         this.registry = new ExtractorRegistry();
@@ -63,15 +61,23 @@ public class YoutubeDL implements AutoCloseable {
 
     public void download(List<String> urls) {
         for (String url : urls) {
-            extractInfo(url, true);
+            extract(url, true);
         }
     }
 
+    /** @deprecated use {@link #extract(String, boolean)} */
     public VideoInfo extractInfo(String url) {
-        return extractInfo(url, false);
+        ExtractorResult result = extract(url, false);
+        return result.isVideo() ? result.getVideo() : null;
     }
 
+    /** @deprecated use {@link #extract(String, boolean)} */
     public VideoInfo extractInfo(String url, boolean download) {
+        ExtractorResult result = extract(url, download);
+        return result.isVideo() ? result.getVideo() : null;
+    }
+
+    public ExtractorResult extract(String url, boolean download) {
         InfoExtractor ie = registry.findSuitable(url);
         if (ie == null) {
             throw new ExtractorException("No suitable extractor found for URL: " + url);
@@ -81,27 +87,62 @@ public class YoutubeDL implements AutoCloseable {
             toScreen("[" + ie.getIeName() + "] Extracting URL: " + url);
         }
 
-        VideoInfo info = ie.extract(url);
-        if (info == null) {
+        ExtractorResult result = ie.extract(url);
+        if (result == null) {
             throw new ExtractorException("Extractor returned no information");
         }
 
-        if (options.isPrintJson()) {
-            try {
-                System.out.println(jsonMapper.writeValueAsString(info));
-            } catch (Exception e) {
-                throw new YtDlpException("Failed to serialize JSON", e);
-            }
-        }
+        printJson(result);
 
         if (download && !options.isSimulate() && !options.isSkipDownload()) {
-            processInfo(info);
+            processResult(result);
         }
 
-        return info;
+        return result;
     }
 
-    private void processInfo(VideoInfo info) {
+    private void printJson(ExtractorResult result) {
+        if (!options.isPrintJson()) {
+            return;
+        }
+        try {
+            Object payload = result.isPlaylist() ? result.getPlaylist() : result.getVideo();
+            System.out.println(jsonMapper.writeValueAsString(payload));
+        } catch (Exception e) {
+            throw new YtDlpException("Failed to serialize JSON", e);
+        }
+    }
+
+    private void processResult(ExtractorResult result) {
+        if (result.isPlaylist()) {
+            processPlaylist(result.getPlaylist());
+        } else if (result.isVideo()) {
+            processVideo(result.getVideo());
+        }
+    }
+
+    private void processPlaylist(PlaylistInfo playlist) {
+        List<VideoInfo> entries = playlist.getEntries();
+        if (!options.isQuiet()) {
+            toScreen("[download] Downloading playlist " + playlist.getTitle() + " - " + entries.size() + " videos");
+        }
+        for (VideoInfo entry : entries) {
+            String entryUrl = entry.getUrl() != null ? entry.getUrl() : entry.getWebpageUrl();
+            if (entryUrl == null) {
+                reportWarning("Skipping playlist entry without URL: " + entry.getId());
+                continue;
+            }
+            if (!options.isQuiet()) {
+                toScreen("[download] Downloading item " + entry.getPlaylistIndex() + " of " + entries.size());
+            }
+            ExtractorResult entryResult = extract(entryUrl, false);
+            if (entryResult.isVideo()) {
+                processVideo(entryResult.getVideo());
+            }
+        }
+    }
+
+    private void processVideo(VideoInfo info) {
         Format selected = formatSelector.select(info, options.getFormat());
         if (selected == null) {
             throw new YtDlpException("Could not select a format to download");

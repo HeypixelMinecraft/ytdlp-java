@@ -1,6 +1,7 @@
 package com.ytdlp.extractor.generic;
 
 import com.ytdlp.extractor.InfoExtractor;
+import com.ytdlp.model.ExtractorResult;
 import com.ytdlp.model.Format;
 import com.ytdlp.model.VideoInfo;
 import com.ytdlp.networking.Request;
@@ -20,7 +21,7 @@ public class GenericExtractor extends InfoExtractor {
     }
 
     @Override
-    protected VideoInfo realExtract(String url) {
+    protected ExtractorResult realExtract(String url) {
         String ext = UrlUtils.determineExt(url, "mp4");
         String filename = UrlUtils.filenameFromUrl(url);
         String id = filename.contains(".") ? filename.substring(0, filename.lastIndexOf('.')) : filename;
@@ -61,6 +62,6 @@ public class GenericExtractor extends InfoExtractor {
         info.setUrl(url);
         info.setExt(format.getExt());
         info.setFormats(List.of(format));
-        return info;
+        return ExtractorResult.video(info);
     }
 }

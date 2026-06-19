@@ -16,6 +16,24 @@ public class YoutubeDLOptions {
     private int bufferSize = 1024;
     private boolean continueDownload = true;
     private String downloadPath = ".";
+    private boolean noPlaylist = false;
+
+    // JS challenge solver (yt-dlp-ejs)
+    private String jsRuntime;
+    private String ejsScriptPath;
+    private int jsSolverTimeout = 60;
+
+    // PO Token
+    private String poToken;
+    private String gvsPoToken;
+    private String visitorData;
+
+    // HLS/DASH
+    private int concurrentFragments = 4;
+
+    // FFmpeg merge
+    private String ffmpegLocation;
+    private String mergeOutputFormat = "mp4";
 
     public String getFormat() {
         return format;
@@ -135,5 +153,85 @@ public class YoutubeDLOptions {
 
     public void setDownloadPath(String downloadPath) {
         this.downloadPath = downloadPath;
+    }
+
+    public boolean isNoPlaylist() {
+        return noPlaylist;
+    }
+
+    public void setNoPlaylist(boolean noPlaylist) {
+        this.noPlaylist = noPlaylist;
+    }
+
+    public String getJsRuntime() {
+        return jsRuntime;
+    }
+
+    public void setJsRuntime(String jsRuntime) {
+        this.jsRuntime = jsRuntime;
+    }
+
+    public String getEjsScriptPath() {
+        return ejsScriptPath;
+    }
+
+    public void setEjsScriptPath(String ejsScriptPath) {
+        this.ejsScriptPath = ejsScriptPath;
+    }
+
+    public int getJsSolverTimeout() {
+        return jsSolverTimeout;
+    }
+
+    public void setJsSolverTimeout(int jsSolverTimeout) {
+        this.jsSolverTimeout = jsSolverTimeout;
+    }
+
+    public String getPoToken() {
+        return poToken;
+    }
+
+    public void setPoToken(String poToken) {
+        this.poToken = poToken;
+    }
+
+    public String getGvsPoToken() {
+        return gvsPoToken;
+    }
+
+    public void setGvsPoToken(String gvsPoToken) {
+        this.gvsPoToken = gvsPoToken;
+    }
+
+    public String getVisitorData() {
+        return visitorData;
+    }
+
+    public void setVisitorData(String visitorData) {
+        this.visitorData = visitorData;
+    }
+
+    public int getConcurrentFragments() {
+        return concurrentFragments;
+    }
+
+    public void setConcurrentFragments(int concurrentFragments) {
+        this.concurrentFragments = concurrentFragments;
+    }
+
+    public String getFfmpegLocation() {
+        return ffmpegLocation;
+    }
+
+    public void setFfmpegLocation(String ffmpegLocation) {
+        this.ffmpegLocation = ffmpegLocation;
+    }
+
+    public String getMergeOutputFormat() {
+        return mergeOutputFormat;
+    }
+
+    public void setMergeOutputFormat(String mergeOutputFormat) {
+        this.mergeOutputFormat = mergeOutputFormat;
     }
 }

@@ -2,6 +2,7 @@ package com.ytdlp.extractor;
 
 import com.ytdlp.extractor.generic.GenericExtractor;
 import com.ytdlp.extractor.youtube.YoutubeExtractor;
+import com.ytdlp.extractor.youtube.YoutubePlaylistExtractor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -12,6 +13,7 @@ public class ExtractorRegistry {
     private final Map<String, InfoExtractor> extractors = new LinkedHashMap<>();
 
     public ExtractorRegistry() {
+        register(new YoutubePlaylistExtractor());
         register(new YoutubeExtractor());
         register(new GenericExtractor());
     }

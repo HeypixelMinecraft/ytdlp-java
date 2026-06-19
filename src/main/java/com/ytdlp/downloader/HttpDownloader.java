@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * HTTP file downloader ported from yt-dlp's HttpFD.
  */
-public class HttpDownloader {
+public class HttpDownloader implements FileDownloader {
     private final YoutubeDL ydl;
     private final YoutubeDLOptions options;
 
@@ -29,6 +29,7 @@ public class HttpDownloader {
         this.options = ydl.getOptions();
     }
 
+    @Override
     public void download(VideoInfo info, Format format, Path destination) {
         String url = format.getUrl();
         if (url == null || url.isBlank()) {

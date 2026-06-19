@@ -44,6 +44,7 @@ public class CliMain {
                 case "--user-agent" -> options.setUserAgent(nextArg(args, ++i, arg));
                 case "-P", "--paths" -> options.setDownloadPath(nextArg(args, ++i, arg));
                 case "--no-continue" -> options.setContinueDownload(false);
+                case "--no-playlist" -> options.setNoPlaylist(true);
                 default -> {
                     if (arg.startsWith("-")) {
                         System.err.println("Unknown option: " + arg);
@@ -98,6 +99,7 @@ public class CliMain {
                   --user-agent UA         Custom User-Agent
                   -P, --paths PATH        Download directory
                   --no-continue           Do not resume partial downloads
+                  --no-playlist           Download single video instead of playlist
                 
                 Examples:
                   yt-dlp-java "https://www.youtube.com/watch?v=BaW_jenozKc"

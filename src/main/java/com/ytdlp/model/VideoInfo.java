@@ -24,6 +24,7 @@ public class VideoInfo {
     private String webpageUrl;
     private String extractor;
     private String extractorKey;
+    private Integer playlistIndex;
 
     public String getType() {
         return type;
@@ -151,5 +152,13 @@ public class VideoInfo {
 
     public void setExtractorKey(String extractorKey) {
         this.extractorKey = extractorKey;
+    }
+
+    public Integer getPlaylistIndex() {
+        return playlistIndex;
+    }
+
+    public void setPlaylistIndex(Integer playlistIndex) {
+        this.playlistIndex = playlistIndex;
     }
 }

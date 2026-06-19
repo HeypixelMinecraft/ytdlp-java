@@ -12,21 +12,40 @@ import java.util.stream.Collectors;
  */
 public class FormatSelector {
 
-    public Format select(VideoInfo info, String formatSpec) {
+    public FormatSelection selectFormats(VideoInfo info, String formatSpec) {
         List<Format> formats = info.getFormats();
         if (formats == null || formats.isEmpty()) {
             if (info.getUrl() != null) {
                 Format direct = new Format();
                 direct.setUrl(info.getUrl());
                 direct.setExt(info.getExt());
-                return direct;
+                return FormatSelection.single(direct);
             }
             return null;
         }
 
-        String spec = formatSpec != null ? formatSpec.trim().toLowerCase() : "best";
+        String spec = formatSpec != null ? formatSpec.trim() : "best";
 
-        // Specific format ID
+        if (spec.contains("+")) {
+            String[] parts = spec.split("\\+", 2);
+            Format video = resolveSingle(info, parts[0].trim(), true);
+            Format audio = resolveSingle(info, parts[1].trim(), false);
+            return FormatSelection.merge(video, audio);
+        }
+
+        return FormatSelection.single(resolveSingle(info, spec, null));
+    }
+
+    /** @deprecated use {@link #selectFormats(VideoInfo, String)} */
+    public Format select(VideoInfo info, String formatSpec) {
+        FormatSelection sel = selectFormats(info, formatSpec);
+        return sel != null ? sel.getSingleFormat() : null;
+    }
+
+    private Format resolveSingle(VideoInfo info, String spec, Boolean videoOnly) {
+        List<Format> formats = info.getFormats();
+        String lower = spec.toLowerCase();
+
         if (spec.matches("\\d+")) {
             return formats.stream()
                     .filter(f -> spec.equals(f.getFormatId()))
@@ -34,25 +53,35 @@ public class FormatSelector {
                     .orElseThrow(() -> new IllegalArgumentException("Format " + spec + " not available"));
         }
 
-        return switch (spec) {
+        if (Boolean.TRUE.equals(videoOnly) || "bestvideo".equals(lower) || lower.startsWith("bv")) {
+            return formats.stream()
+                    .filter(f -> !f.isHasDrm())
+                    .filter(Format::isVideoOnly)
+                    .max(Comparator.comparingInt(this::formatScore))
+                    .orElseGet(() -> formats.stream().filter(Format::hasVideo).max(Comparator.comparingInt(this::formatScore)).orElse(formats.get(0)));
+        }
+        if (Boolean.FALSE.equals(videoOnly) || "bestaudio".equals(lower) || lower.startsWith("ba")) {
+            return formats.stream()
+                    .filter(f -> !f.isHasDrm())
+                    .filter(Format::isAudioOnly)
+                    .max(Comparator.comparingInt(f -> f.getTbr() != null ? f.getTbr() : 0))
+                    .orElseGet(() -> formats.stream().filter(Format::hasAudio).max(Comparator.comparingInt(f -> f.getTbr() != null ? f.getTbr() : 0)).orElse(formats.get(0)));
+        }
+
+        return switch (lower) {
             case "worst" -> formats.stream()
                     .min(Comparator.comparingInt(this::formatScore))
                     .orElse(formats.get(0));
-            case "bestaudio" -> formats.stream()
-                    .filter(Format::isAudioOnly)
-                    .max(Comparator.comparingInt(f -> f.getTbr() != null ? f.getTbr() : 0))
-                    .orElseGet(() -> selectBest(formats));
-            case "bestvideo" -> formats.stream()
-                    .filter(Format::isVideoOnly)
-                    .max(Comparator.comparingInt(this::resolutionScore))
-                    .orElseGet(() -> selectBest(formats));
             default -> selectBest(formats);
         };
     }
 
     private Format selectBest(List<Format> formats) {
-        // Prefer combined formats (video+audio) with highest resolution
-        List<Format> combined = formats.stream()
+        List<Format> usable = formats.stream().filter(f -> !f.isHasDrm()).collect(Collectors.toList());
+        if (usable.isEmpty()) {
+            usable = formats;
+        }
+        List<Format> combined = usable.stream()
                 .filter(f -> f.hasVideo() && f.hasAudio())
                 .collect(Collectors.toList());
 
@@ -62,7 +91,7 @@ public class FormatSelector {
                     .orElse(combined.get(0));
         }
 
-        return formats.stream()
+        return usable.stream()
                 .max(Comparator.comparingInt(this::formatScore))
                 .orElse(formats.get(0));
     }
@@ -74,6 +103,9 @@ public class FormatSelector {
         }
         if (f.hasVideo() && f.hasAudio()) {
             score += 10000;
+        }
+        if ("https".equals(f.getProtocol()) || "http".equals(f.getProtocol())) {
+            score += 500;
         }
         return score;
     }

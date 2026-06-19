@@ -3,6 +3,7 @@ package com.ytdlp.extractor.youtube;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ytdlp.exception.ExtractorException;
 import com.ytdlp.extractor.InfoExtractor;
+import com.ytdlp.model.ExtractorResult;
 import com.ytdlp.model.Format;
 import com.ytdlp.model.VideoInfo;
 import com.ytdlp.util.JsonUtils;
@@ -41,7 +42,7 @@ public class YoutubeExtractor extends InfoExtractor {
     }
 
     @Override
-    protected VideoInfo realExtract(String url) {
+    protected ExtractorResult realExtract(String url) {
         String videoId = extractVideoId(url);
         if (videoId == null) {
             throw new ExtractorException("Could not extract video ID from URL: " + url);
@@ -58,7 +59,7 @@ public class YoutubeExtractor extends InfoExtractor {
                     true);
         }
         info.setFormats(formats);
-        return info;
+        return ExtractorResult.video(info);
     }
 
     private JsonNode fetchBestPlayerResponse(String videoId) {

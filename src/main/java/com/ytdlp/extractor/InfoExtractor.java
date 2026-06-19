@@ -1,7 +1,7 @@
 package com.ytdlp.extractor;
 
 import com.ytdlp.YoutubeDL;
-import com.ytdlp.model.VideoInfo;
+import com.ytdlp.model.ExtractorResult;
 
 import java.util.regex.Pattern;
 
@@ -33,18 +33,25 @@ public abstract class InfoExtractor {
         return validUrl.matcher(url).find();
     }
 
-    public VideoInfo extract(String url) {
-        VideoInfo info = realExtract(url);
-        if (info != null) {
-            info.setExtractor(ieName);
-            info.setExtractorKey(ieKey);
+    public ExtractorResult extract(String url) {
+        ExtractorResult result = realExtract(url);
+        if (result == null) {
+            return null;
         }
-        return info;
+        if (result.isVideo() && result.getVideo() != null) {
+            result.getVideo().setExtractor(ieName);
+            result.getVideo().setExtractorKey(ieKey);
+        }
+        if (result.isPlaylist() && result.getPlaylist() != null) {
+            result.getPlaylist().setExtractor(ieName);
+            result.getPlaylist().setExtractorKey(ieKey);
+        }
+        return result;
     }
 
-    protected abstract VideoInfo realExtract(String url);
+    protected abstract ExtractorResult realExtract(String url);
 
-    protected String downloadWebpage(String url, String videoId) {
+    protected String downloadWebpage(String url, String itemId) {
         return ydl.getRequestDirector().downloadString(new com.ytdlp.networking.Request(url));
     }
 

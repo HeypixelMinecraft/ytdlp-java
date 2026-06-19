@@ -105,4 +105,64 @@ public final class JsonUtils {
         }
         return null;
     }
+
+    /**
+     * Extracts a balanced JSON object starting after {@code marker} in {@code text}.
+     */
+    public static String extractJsonAfterMarker(String text, String marker) {
+        int start = text.indexOf(marker);
+        if (start < 0) {
+            return null;
+        }
+        start = text.indexOf('{', start + marker.length());
+        if (start < 0) {
+            return null;
+        }
+        int depth = 0;
+        boolean inString = false;
+        boolean escape = false;
+        for (int i = start; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (inString) {
+                if (escape) {
+                    escape = false;
+                } else if (c == '\\') {
+                    escape = true;
+                } else if (c == '"') {
+                    inString = false;
+                }
+                continue;
+            }
+            if (c == '"') {
+                inString = true;
+            } else if (c == '{') {
+                depth++;
+            } else if (c == '}') {
+                depth--;
+                if (depth == 0) {
+                    return text.substring(start, i + 1);
+                }
+            }
+        }
+        return null;
+    }
+
+    /** Reads text from a node that may be simpleText or runs[0].text */
+    public static String getTextFlexible(JsonNode node) {
+        if (node == null) {
+            return null;
+        }
+        if (node.isTextual()) {
+            return node.asText();
+        }
+        String simple = getText(node, "simpleText");
+        if (simple != null) {
+            return simple;
+        }
+        JsonNode runs = node.get("runs");
+        if (runs != null && runs.isArray() && !runs.isEmpty()) {
+            return getText(runs.get(0), "text");
+        }
+        return null;
+    }
 }
