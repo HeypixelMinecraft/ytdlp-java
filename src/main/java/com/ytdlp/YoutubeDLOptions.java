@@ -35,6 +35,11 @@ public class YoutubeDLOptions {
     private String ffmpegLocation;
     private String mergeOutputFormat = "mp4";
 
+    // External yt-dlp subprocess bridge (optional; disabled by default — use pure Java extractors)
+    private boolean externalYtDlpEnabled = false;
+    private String externalYtDlpPath;
+    private long externalYtDlpTimeout = 120;
+
     public String getFormat() {
         return format;
     }
@@ -233,5 +238,29 @@ public class YoutubeDLOptions {
 
     public void setMergeOutputFormat(String mergeOutputFormat) {
         this.mergeOutputFormat = mergeOutputFormat;
+    }
+
+    public boolean isExternalYtDlpEnabled() {
+        return externalYtDlpEnabled;
+    }
+
+    public void setExternalYtDlpEnabled(boolean externalYtDlpEnabled) {
+        this.externalYtDlpEnabled = externalYtDlpEnabled;
+    }
+
+    public String getExternalYtDlpPath() {
+        return externalYtDlpPath;
+    }
+
+    public void setExternalYtDlpPath(String externalYtDlpPath) {
+        this.externalYtDlpPath = externalYtDlpPath;
+    }
+
+    public long getExternalYtDlpTimeout() {
+        return externalYtDlpTimeout;
+    }
+
+    public void setExternalYtDlpTimeout(long externalYtDlpTimeout) {
+        this.externalYtDlpTimeout = externalYtDlpTimeout;
     }
 }

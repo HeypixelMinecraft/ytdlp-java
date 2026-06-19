@@ -2,7 +2,8 @@ package com.ytdlp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.ytdlp.downloader.HttpDownloader;
+import com.ytdlp.bridge.YtDlpBridge;
+import com.ytdlp.downloader.DownloaderFactory;
 import com.ytdlp.exception.ExtractorException;
 import com.ytdlp.exception.YtDlpException;
 import com.ytdlp.extractor.ExtractorRegistry;
@@ -27,8 +28,9 @@ public class YoutubeDL implements AutoCloseable {
     private final ExtractorRegistry registry;
     private final RequestDirector requestDirector;
     private final FormatSelector formatSelector;
-    private final HttpDownloader httpDownloader;
+    private final DownloaderFactory downloaderFactory;
     private final ObjectMapper jsonMapper;
+    private YtDlpBridge externalBridge;
 
     public YoutubeDL(YoutubeDLOptions options) {
         this(options, null);
@@ -36,10 +38,10 @@ public class YoutubeDL implements AutoCloseable {
 
     public YoutubeDL(YoutubeDLOptions options, OkHttpClient httpClient) {
         this.options = options;
-        this.registry = new ExtractorRegistry();
+        this.registry = new ExtractorRegistry(options.isExternalYtDlpEnabled());
         this.requestDirector = new RequestDirector(options, httpClient);
         this.formatSelector = new FormatSelector();
-        this.httpDownloader = new HttpDownloader(this);
+        this.downloaderFactory = new DownloaderFactory(this);
         this.jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
         for (InfoExtractor ie : registry.getExtractors()) {
@@ -80,7 +82,10 @@ public class YoutubeDL implements AutoCloseable {
     public ExtractorResult extract(String url, boolean download) {
         InfoExtractor ie = registry.findSuitable(url);
         if (ie == null) {
-            throw new ExtractorException("No suitable extractor found for URL: " + url);
+            throw new ExtractorException(
+                    "No suitable extractor found for URL: " + url
+                            + ". Try enabling external yt-dlp via options.setExternalYtDlpEnabled(true).",
+                    true);
         }
 
         if (!options.isQuiet()) {
@@ -143,6 +148,15 @@ public class YoutubeDL implements AutoCloseable {
     }
 
     private void processVideo(VideoInfo info) {
+        if (isExternalExtracted(info)) {
+            String downloadUrl = info.getWebpageUrl() != null ? info.getWebpageUrl() : info.getUrl();
+            if (downloadUrl == null) {
+                throw new YtDlpException("No URL available for external yt-dlp download");
+            }
+            getExternalBridge().download(downloadUrl);
+            return;
+        }
+
         Format selected = formatSelector.select(info, options.getFormat());
         if (selected == null) {
             throw new YtDlpException("Could not select a format to download");
@@ -155,7 +169,18 @@ public class YoutubeDL implements AutoCloseable {
                 selected.getExt());
 
         Path destination = Path.of(options.getDownloadPath(), filename);
-        httpDownloader.download(info, selected, destination);
+        downloaderFactory.download(info, selected, destination);
+    }
+
+    private boolean isExternalExtracted(VideoInfo info) {
+        return "ExternalYtDlp".equals(info.getExtractorKey());
+    }
+
+    private YtDlpBridge getExternalBridge() {
+        if (externalBridge == null) {
+            externalBridge = new YtDlpBridge(options);
+        }
+        return externalBridge;
     }
 
     public void toScreen(String message) {

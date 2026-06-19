@@ -1,0 +1,97 @@
+[
+  {
+    "providerName": "Vimeo",
+    "urlPatterns": ["https://vimeo.com/*", "https://vimeo.com/album/*/video/*", "https://vimeo.com/channels/*/*", "https://vimeo.com/groups/*/videos/*"],
+    "endpoint": "https://vimeo.com/api/oembed.json?url={url}"
+  },
+  {
+    "providerName": "Flickr",
+    "urlPatterns": ["http://www.flickr.com/photos/*/*", "http://flic.kr/p/*"],
+    "endpoint": "https://www.flickr.com/services/oembed?format=json&url={url}"
+  },
+  {
+    "providerName": "SoundCloud",
+    "urlPatterns": ["https://soundcloud.com/*/*", "https://soundcloud.com/*/*?*"],
+    "endpoint": "https://soundcloud.com/oembed?format=json&url={url}"
+  },
+  {
+    "providerName": "Twitter",
+    "urlPatterns": ["https://twitter.com/*/status/*", "https://x.com/*/status/*"],
+    "endpoint": "https://publish.twitter.com/oembed?url={url}"
+  },
+  {
+    "providerName": "Reddit",
+    "urlPatterns": ["https://reddit.com/r/*/comments/*/*", "https://www.reddit.com/r/*/comments/*/*"],
+    "endpoint": "https://www.reddit.com/oembed?url={url}"
+  },
+  {
+    "providerName": "TikTok",
+    "urlPatterns": ["https://www.tiktok.com/@*/video/*"],
+    "endpoint": "https://www.tiktok.com/oembed?url={url}"
+  },
+  {
+    "providerName": "Dailymotion",
+    "urlPatterns": ["https://www.dailymotion.com/video/*", "https://dai.ly/*"],
+    "endpoint": "https://www.dailymotion.com/services/oembed?url={url}"
+  },
+  {
+    "providerName": "Streamable",
+    "urlPatterns": ["https://streamable.com/*"],
+    "endpoint": "https://api.streamable.com/oembed.json?url={url}"
+  },
+  {
+    "providerName": "Loom",
+    "urlPatterns": ["https://www.loom.com/share/*"],
+    "endpoint": "https://www.loom.com/v1/oembed?url={url}"
+  },
+  {
+    "providerName": "Wistia",
+    "urlPatterns": ["https://*.wistia.com/medias/*"],
+    "endpoint": "https://fast.wistia.com/oembed?url={url}"
+  },
+  {
+    "providerName": "Mixcloud",
+    "urlPatterns": ["https://www.mixcloud.com/*/*"],
+    "endpoint": "https://www.mixcloud.com/oembed/?url={url}&format=json"
+  },
+  {
+    "providerName": "Spotify",
+    "urlPatterns": ["https://open.spotify.com/track/*", "https://open.spotify.com/episode/*"],
+    "endpoint": "https://open.spotify.com/oembed?url={url}"
+  },
+  {
+    "providerName": "TED",
+    "urlPatterns": ["https://www.ted.com/talks/*"],
+    "endpoint": "https://www.ted.com/services/v1/oembed.json?url={url}"
+  },
+  {
+    "providerName": "SlideShare",
+    "urlPatterns": ["https://www.slideshare.net/*/*"],
+    "endpoint": "https://www.slideshare.net/api/oembed/2?format=json&url={url}"
+  },
+  {
+    "providerName": "Scribd",
+    "urlPatterns": ["https://www.scribd.com/document/*"],
+    "endpoint": "https://www.scribd.com/services/oembed?format=json&url={url}"
+  },
+  {
+    "providerName": "Kickstarter",
+    "urlPatterns": ["https://www.kickstarter.com/projects/*/*"],
+    "endpoint": "https://www.kickstarter.com/services/oembed?url={url}"
+  },
+  {
+    "providerName": "SmugMug",
+    "urlPatterns": ["https://*.smugmug.com/*/*"],
+    "endpoint": "https://api.smugmug.com/services/oembed/?format=json&url={url}"
+  },
+  {
+    "providerName": "Hulu",
+    "urlPatterns": ["https://www.hulu.com/watch/*"],
+    "endpoint": "https://www.hulu.com/api/oembed.json?url={url}"
+  },
+  {
+    "providerName": "NYTimes",
+    "urlPatterns": ["https://www.nytimes.com/video/*"],
+    "endpoint": "https://www.nytimes.com/svc/oembed/json/?url={url}"
+  }
+]

@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.yt-dlp"
-version = "0.1.0-SNAPSHOT"
+version = "0.2.0-SNAPSHOT"
 
 java {
     toolchain {
@@ -17,6 +17,7 @@ java {
 dependencies {
     api("com.squareup.okhttp3:okhttp:4.12.0")
     api("com.fasterxml.jackson.core:jackson-databind:2.18.2")
+    api("org.jsoup:jsoup:1.18.3")
 
     compileOnly("org.slf4j:slf4j-api:2.0.16")
 

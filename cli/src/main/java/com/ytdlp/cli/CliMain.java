@@ -10,7 +10,7 @@ import java.util.List;
  * Command-line entry point ported from yt-dlp's main().
  */
 public class CliMain {
-    private static final String VERSION = "0.1.0";
+    private static final String VERSION = "0.2.0";
 
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -45,6 +45,9 @@ public class CliMain {
                 case "-P", "--paths" -> options.setDownloadPath(nextArg(args, ++i, arg));
                 case "--no-continue" -> options.setContinueDownload(false);
                 case "--no-playlist" -> options.setNoPlaylist(true);
+                case "--external-yt-dlp" -> options.setExternalYtDlpEnabled(true);
+                case "--no-external-yt-dlp" -> options.setExternalYtDlpEnabled(false);
+                case "--yt-dlp-location" -> options.setExternalYtDlpPath(nextArg(args, ++i, arg));
                 default -> {
                     if (arg.startsWith("-")) {
                         System.err.println("Unknown option: " + arg);
@@ -80,7 +83,7 @@ public class CliMain {
 
     private static void printHelp() {
         System.out.println("""
-                yt-dlp-java - A Java port of yt-dlp (MVP)
+                yt-dlp-java - A Java port of yt-dlp
                 
                 Usage: yt-dlp-java [OPTIONS] URL [URL...]
                 
@@ -100,6 +103,9 @@ public class CliMain {
                   -P, --paths PATH        Download directory
                   --no-continue           Do not resume partial downloads
                   --no-playlist           Download single video instead of playlist
+                  --external-yt-dlp       Enable optional yt-dlp binary fallback (1000+ sites)
+                  --no-external-yt-dlp    Disable yt-dlp subprocess fallback (native Java only)
+                  --yt-dlp-location PATH  Path to yt-dlp executable (default: search PATH)
                 
                 Examples:
                   yt-dlp-java "https://www.youtube.com/watch?v=BaW_jenozKc"
